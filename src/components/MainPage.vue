@@ -1,11 +1,13 @@
 <template>
   <div class="container">
+    <p v-if="isLoading" class="loading">Загрузка...</p>
     <form v-on:submit="search">
       <MyInput
         title="Запрос: "
         placeholder="что найти"
         class="input"
         v-model="query"
+        :required="true"
       />
       <MyInput
         title="Бренд: "
@@ -15,21 +17,31 @@
       />
       <button class="button" type="submit">Найти</button>
     </form>
-    <h2 v-if="queryTitle" class="text">Ответ на запрос "{{ queryTitle }}"</h2>
-    <h2 v-if="brandTitle" class="text">Поиск бренда "{{ brandTitle }}"</h2>
-    <ol>
-      <li v-for="product in products" :key="product" class="brand-item">
-        <p
-          v-if="product.toLowerCase() === brandTitle.toLowerCase()"
-          class="p-active"
+    <div v-if="!isLoading">
+      <h2 v-if="query" class="text">Ответ на запрос "{{ query }}"</h2>
+      <h2 v-if="brand" class="text">
+        Поиск бренда "{{ brand }}"
+        <i v-if="brandIsExist" class="p-active">(найдено)</i>
+        <i v-else class="p-active">(не найдено)</i>
+      </h2>
+      <ol>
+        <li
+          v-for="productBrand in productBrands"
+          :key="productBrand"
+          class="brand-item"
         >
-          {{ product }}
-        </p>
-        <p v-else class="p-normal">
-          {{ product }}
-        </p>
-      </li>
-    </ol>
+          <p
+            v-if="productBrand?.toLowerCase() === brand?.toLowerCase()"
+            class="p-active"
+          >
+            {{ productBrand }}
+          </p>
+          <p v-else>
+            {{ productBrand }}
+          </p>
+        </li>
+      </ol>
+    </div>
   </div>
 </template>
 
@@ -43,9 +55,9 @@ export default {
   brand: "",
   data() {
     return {
-      products: [],
-      queryTitle: "",
-      brandTitle: "",
+      productBrands: [],
+      brandIsExist: false,
+      isLoading: false,
     };
   },
   components: {
@@ -54,16 +66,23 @@ export default {
   methods: {
     search(e) {
       e.preventDefault();
-      console.log(this);
+      this.isLoading = true;
       $api.get("", { params: { query: this.query } }).then((response) => {
-        this.queryTitle = this.query;
-        this.brandTitle = this.brand;
+        this.isLoading = false;
         const brands = response.data.data.products
           .map((el) => el.brand)
           .filter((el) => el !== undefined)
           .filter((el) => el !== "");
         const prodsSet = new Set(brands);
-        this.products = Array.from(prodsSet);
+        this.productBrands = Array.from(prodsSet);
+
+        if (
+          [...this.productBrands].findIndex(
+            (el) => el.toLowerCase() === this.brand?.toLowerCase()
+          ) !== -1
+        )
+          this.brandIsExist = true;
+        else this.brandIsExist = false;
       });
     },
   },
@@ -99,5 +118,12 @@ export default {
   color: red;
   font-size: 24px;
   margin: 0;
+}
+
+.loading {
+  background: blue;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
 }
 </style>

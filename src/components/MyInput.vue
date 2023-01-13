@@ -4,7 +4,8 @@
     <input
       type="text"
       :placeholder="placeholder"
-      :value="name"
+      :required="required"
+      :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       class="input"
     />
@@ -16,14 +17,11 @@ export default {
   name: "MyInput",
   props: {
     title: String,
-    modelValue: { type: String },
+    modelValue: String,
     placeholder: String,
+    required: Boolean,
   },
-  methods: {
-    updateValue(event) {
-      this.$emit("update:value", event.target.value);
-    },
-  },
+  emits: ["update:modelValue"],
 };
 </script>
 
