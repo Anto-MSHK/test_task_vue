@@ -1,6 +1,9 @@
 # test_task
 
-## Project setup
+## Описание
+Поисковая выдача wildberries. Поиск товаров с выдачей брендов. Есть проверка наличия определённого бренда в списке (можно вбивать имя в любой раскладке).
+
+### Project setup
 ```
 npm install
 ```
@@ -14,11 +17,3 @@ npm run serve
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
